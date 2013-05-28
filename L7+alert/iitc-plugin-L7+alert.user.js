@@ -1,8 +1,10 @@
 // ==UserScript==
 // @id             iitc-plugin-l7+-alert@agentor
 // @name           IITC plugin: L7+ Alert
-// @version        0.3.20130425
+// @version        0.4.20130528
 // @namespace      https://github.com/jonatkins/ingress-intel-total-conversion
+// @updateURL      https://github.com/agentor/iitc-plugins/raw/master/L7%2Balert/iitc-plugin-L7%2Balert.user.js
+// @downloadURL    https://github.com/agentor/iitc-plugins/raw/master/L7%2Balert/iitc-plugin-L7%2Balert.user.js
 // @include        https://www.ingress.com/intel*
 // @include        http://www.ingress.com/intel*
 // @match          https://www.ingress.com/intel*
@@ -20,17 +22,45 @@ if(typeof window.plugin !== 'function') window.plugin = function() {};
 window.plugin.portalAlert = function() {};
 
 window.plugin.portalAlert.portalAdded = function(data) {
+    
 	var d = data.portal.options.details;
     var portal = data.portal;
    
     var portal_level = getPortalLevel(d).toFixed(2);
     var portal_guid = data.portal.options.guid;
     var portal_guid_html = data.portal.options.guid.replace('.','');
-    var portal_address = d.portalV2.descriptiveText.ADDRESS;
-    var tmp = portal_address.split(',');
-    var portal_city = tmp[1];
-    
+    if(d.portalV2.descriptiveText.ADDRESS) {
+	    var portal_address = d.portalV2.descriptiveText.ADDRESS;
+       	var tmp = portal_address.split(',');
+    	var portal_city = tmp[1];
+    } else {
+     	portal_city = '';   
+    }
+   
     if(portal_level >= 7 && $('#L7_'+portal_guid_html).length == 0) {
+       navigator.geolocation.getCurrentPosition(function(position){ 
+           
+            lat1 = position.coords.latitude;
+            lat2 = portal._latlng.lat;
+            lon1 = position.coords.longitude;
+            lon2 = portal._latlng.lng;
+            var R = 6371; // km
+            var dLat = (lat2-lat1) * Math.PI / 180;
+            var dLon = (lon2-lon1) * Math.PI / 180;
+            var lat1 = lat1 * Math.PI / 180;
+            var lat2 = lat2 * Math.PI / 180;
+            
+            var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+            var d = R * c;
+            $('#L7_'+portal_guid_html+'_distance').text((Math.round(d * 100) / 100).toString()+' km');
+            
+        }, function(){
+            console.log('L7+alert: geolocation error');
+        });   
+        
+        
     	var portal_title = d.portalV2.descriptiveText.TITLE;
        
         var team = portal.options.team;
@@ -48,7 +78,7 @@ window.plugin.portalAlert.portalAdded = function(data) {
                 html += ' style="color:#03DC03;"';
                 break;
         }
-        html += '>'+portal_title+'</a></td><td>'+portal_city+'</td></tr>';
+        html += '>'+portal_title+'</a></td><td>'+portal_city+'</td><td id="L7_'+portal_guid_html+'_distance"></td></tr>';
         $('#chat div#portal_alert table').append(html);
        
         switch (team){
@@ -66,8 +96,10 @@ window.plugin.portalAlert.portalAdded = function(data) {
     return false;
 }
 
+
 window.plugin.portalAlert.blinkStateEnlightened = false;
 window.plugin.portalAlert.blinkStateResistance = false;
+window.plugin.portalAlert.km = '';
 
 window.plugin.portalAlert.blinkStateEnlightened1 = function(data) {
 	    $('#chatcontrols a#portal_alert_control').css('background-color','red').css('color','white');
