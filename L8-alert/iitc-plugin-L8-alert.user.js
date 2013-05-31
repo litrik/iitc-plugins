@@ -3,8 +3,8 @@
 // @name           IITC plugin: L8 Alert
 // @version        0.4.20130531
 // @namespace      https://github.com/jonatkins/ingress-intel-total-conversion
-// @updateURL      https://github.com/agentor/iitc-plugins/raw/master/L8%2Balert/iitc-plugin-L8-alert.user.js
-// @downloadURL    https://github.com/agentor/iitc-plugins/raw/master/L8%2Balert/iitc-plugin-L8-alert.user.js
+// @updateURL      https://github.com/agentor/iitc-plugins/raw/master/L8-alert/iitc-plugin-L8-alert.user.js
+// @downloadURL    https://github.com/agentor/iitc-plugins/raw/master/L8-alert/iitc-plugin-L8-alert.user.js
 // @include        https://www.ingress.com/intel*
 // @include        http://www.ingress.com/intel*
 // @match          https://www.ingress.com/intel*
