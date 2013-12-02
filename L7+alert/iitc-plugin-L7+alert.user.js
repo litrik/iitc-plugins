@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             iitc-plugin-l7+-alert@agentor
 // @name           IITC plugin: L7+ Alert
-// @version        0.4.20130528
+// @version        0.5.20131202
 // @namespace      https://github.com/jonatkins/ingress-intel-total-conversion
 // @updateURL      https://github.com/agentor/iitc-plugins/raw/master/L7%2Balert/iitc-plugin-L7%2Balert.user.js
 // @downloadURL    https://github.com/agentor/iitc-plugins/raw/master/L7%2Balert/iitc-plugin-L7%2Balert.user.js
@@ -23,27 +23,21 @@ window.plugin.portalAlert = function() {};
 
 window.plugin.portalAlert.portalAdded = function(data) {
     
-	var d = data.portal.options.details;
-    var portal = data.portal;
-   
-    var portal_level = getPortalLevel(d).toFixed(2);
-    var portal_guid = data.portal.options.guid;
-    var portal_guid_html = data.portal.options.guid.replace('.','');
-    if(d.portalV2.descriptiveText.ADDRESS) {
-	    var portal_address = d.portalV2.descriptiveText.ADDRESS;
-       	var tmp = portal_address.split(',');
-    	var portal_city = tmp[1];
-    } else {
-     	portal_city = '';   
-    }
+    var portal = data.portal.options;
+
+    var portal_level = portal.data.level;;
+    var portal_guid = portal.guid;
+    var portal_guid_html = portal.guid.replace('.','');
+    var	portal_address = '';
+    var	portal_city = '';
    
     if(portal_level >= 7 && $('#L7_'+portal_guid_html).length == 0) {
        navigator.geolocation.getCurrentPosition(function(position){ 
-           
+
             lat1 = position.coords.latitude;
-            lat2 = portal._latlng.lat;
+            lat2 = portal.data.latE6/1E6;
             lon1 = position.coords.longitude;
-            lon2 = portal._latlng.lng;
+            lon2 = portal.data.lngE6/1E6;
             var R = 6371; // km
             var dLat = (lat2-lat1) * Math.PI / 180;
             var dLon = (lon2-lon1) * Math.PI / 180;
@@ -61,15 +55,15 @@ window.plugin.portalAlert.portalAdded = function(data) {
         });   
         
         
-    	var portal_title = d.portalV2.descriptiveText.TITLE;
+    	var portal_title = portal.data.title;
        
-        var team = portal.options.team;
+        var team = portal.team;
         var html ='';
         html += '<tr>';
         html += '<td>L'+ Math.floor(portal_level)+'</td><td>('+portal_level	+')</td>';
         html += '<td><a id="L7_'+portal_guid_html+'" class="help" title="'+portal_address+'" ';
-        html += ' onclick="window.zoomToAndShowPortal(\''+portal_guid+'\', [' + portal._latlng.lat + ', ' + portal._latlng.lng + ']);return false"';
-        html += ' href="/intel?latE6=' + portal._latlng.lat*1E6 + '&lngE6=' + portal._latlng.lng*1E6 + '&z=17&pguid='+portal_guid+'"';
+        html += ' onclick="window.zoomToAndShowPortal(\''+portal_guid+'\', [' + portal.data.latE6/1E6 + ', ' + portal.data.lngE6/1E6 + ']);return false"';
+        html += ' href="/intel?ll=' + portal.data.latE6/1E6 + ',' + portal.data.lngE6/1E6 + '&pll=' + portal.data.latE6/1E6 + ',' + portal.data.lngE6/1E6 + '&z=17"';
         switch (team){
             case 1 :
                 html += ' style="color:#0088FF;"';
@@ -144,7 +138,7 @@ window.plugin.portalAlert.displayAlertBox = function(data) {
 
 var setup =  function() {
   window.addHook('portalAdded', window.plugin.portalAlert.portalAdded);
-  window.addHook('portalDataLoaded', window.plugin.portalAlert.portalDataLoaded);
+ // window.addHook('portalDataLoaded', window.plugin.portalAlert.portalDataLoaded);
   window.COLOR_SELECTED_PORTAL = '#f0f';
 
   $('#chatcontrols').append(' <a id="portal_alert_control" onclick="window.plugin.portalAlert.displayAlertBox()">L7+ Alert</a>');
