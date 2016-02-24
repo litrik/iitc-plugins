@@ -3,8 +3,8 @@
 // @name           IITC plugin: L8 Alert
 // @version        0.5.20131202
 // @namespace      https://github.com/jonatkins/ingress-intel-total-conversion
-// @updateURL      https://github.com/agentor/iitc-plugins/raw/master/L8-alert/iitc-plugin-L8Balert.user.js
-// @downloadURL    https://github.com/agentor/iitc-plugins/raw/master/L8-alert/iitc-plugin-L8Balert.user.js
+// @updateURL      https://github.com/litrik/iitc-plugins/raw/master/L8-alert/iitc-plugin-L8Balert.user.js
+// @downloadURL    https://github.com/litrik/iitc-plugins/raw/master/L8-alert/iitc-plugin-L8Balert.user.js
 // @include        https://www.ingress.com/intel*
 // @include        http://www.ingress.com/intel*
 // @match          https://www.ingress.com/intel*
@@ -97,6 +97,7 @@ window.plugin.portalAlertL8.km = '';
 
 window.plugin.portalAlertL8.blinkStateEnlightened1 = function(data) {
 	    $('#chatcontrols a#l8_portal_alert_control').css('background-color','red').css('color','white');
+	    document.getElementById('beep_sound').play();
     	setTimeout("window.plugin.portalAlertL8.blinkStateEnlightened2()",500);
 }
 
@@ -108,6 +109,7 @@ window.plugin.portalAlertL8.blinkStateEnlightened2 = function(data) {
 }
 window.plugin.portalAlertL8.blinkStateResistance1 = function(data) {
 	    $('#chatcontrols a#l8_portal_alert_control').css('background-color','#0088FF').css('color','white');
+	    document.getElementById('beep_sound').play();
     	setTimeout("window.plugin.portalAlertL8.blinkStateResistance2()",500);
 }
 
@@ -142,7 +144,7 @@ var setup =  function() {
   window.COLOR_SELECTED_PORTAL = '#f0f';
 
   $('#chatcontrols').append(' <a id="l8_portal_alert_control" onclick="window.plugin.portalAlertL8.displayAlertBox()">L8 Alert</a>');
-  $('#chat').append(' <div id="l8_portal_alert" style="display:none;"><table></table></div>');
+  $('#chat').append(' <div id="l8_portal_alert" style="display:none;"><table></table><audio id="beep_sound" src="http://www.soundjay.com/button/beep-07.wav"></audio></div>');
  
 }
 
